@@ -14,7 +14,7 @@ spec:
   source:
     git:
       ref: main
-      uri: "https://github.com/ElNaga/yamlOpenshift"
+      uri: "https://github.com/ElNaga/DockerPythonApp"
     type: Git
   strategy:
     dockerStrategy:
@@ -45,7 +45,7 @@ spec:
     spec:
       containers:
       - name: python-simple-build
-        image: python-simple-build:latest
+        image: 172.30.1.1:5000/from-terminal/python-simple-build
         ports:
         - containerPort: 8080
 ---
