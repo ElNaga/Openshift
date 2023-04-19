@@ -1,0 +1,21 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: "python-simple-build"
+spec:
+  runPolicy: "Serial"
+  source:
+    git:
+      ref: main
+      uri: "https://github.com/ElNaga/yamlOpenshift"
+    type: Git
+  strategy:
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: "ImageStreamTag"
+      name: "python-simple-build:latest"
+    type: Docker
+  triggers:
+    - type: ConfigChange

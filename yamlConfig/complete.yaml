@@ -1,0 +1,78 @@
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  name: python-simple-build
+---
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: "python-simple-build"
+  annotations:
+    "kubectl.kubernetes.io/depends-on": "ImageStream/python-simple-build"
+spec:
+  runPolicy: "Serial"
+  source:
+    git:
+      ref: main
+      uri: "https://github.com/ElNaga/yamlOpenshift"
+    type: Git
+  strategy:
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: "ImageStreamTag"
+      name: "python-simple-build:latest"
+    type: Docker
+  triggers:
+  - type: ConfigChange
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-simple-build
+  annotations:
+    "kubectl.kubernetes.io/depends-on": "BuildConfig/python-simple-build"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-simple-build
+  template:
+    metadata:
+      labels:
+        app: python-simple-build
+    spec:
+      containers:
+      - name: python-simple-build
+        image: python-simple-build:latest
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-simple-build
+  annotations:
+    "kubectl.kubernetes.io/depends-on": "Deployment/python-simple-build"
+spec:
+  selector:
+    app: python-simple-build
+  ports:
+  - name: 8080-tcp
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: python-simple-build-route
+  annotations:
+    "kubectl.kubernetes.io/depends-on": "Service/python-simple-build"
+spec:
+  to:
+    kind: Service
+    name: python-simple-build
+  port:
+    targetPort: 8080-tcp

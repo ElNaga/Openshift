@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-simple-build
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-simple-build
+  template:
+    metadata:
+      labels:
+        app: python-simple-build
+    spec:
+      containers:
+        - name: python-simple-build
+          image: 172.30.1.1:5000/yaml/python-simple-build
+          ports:
+            - containerPort: 8080
